@@ -550,8 +550,6 @@ function connectDevice(ipAddress, token) {
 
   ws.onerror = (error) => {
     console.error("WebSocket error:", error);
-    // Attempt to reconnect after some time
-    setTimeout(connectDevice(ipAddress), 2500);
   };
 
   ws.onclose = () => {
@@ -561,7 +559,7 @@ function connectDevice(ipAddress, token) {
     clearInterval(heartbeatInterval);
 
     // Attempt to reconnect after some time
-    setTimeout(connectDevice(ipAddress), 1000);
+    setTimeout(connectDevice(ipAddress), 2500);
   };
 }
 
