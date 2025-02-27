@@ -6,7 +6,7 @@
   "Name": "DHD Stream Deck",
   "Icon": "assets/plugin-icon",
   "URL": "https://github.com/DHD-audio/streamdeck-DHD",
-  "Version": "1.0.1",
+  "Version": "1.0.2",
   "Software": {
     "MinimumVersion": "5.0"
   },
