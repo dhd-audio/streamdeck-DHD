@@ -2,10 +2,6 @@
   "Description": "Control your DHD console with this Stream Deck plugin.",
   "Name": "DHD",
   "Category": "Remote Control",
-  "audio.dhd.s52.btnonoff": {
-    "Name": "Action",
-    "Tooltip": "Generic bool operation"
-  },
   "Localization": {
   }
 }

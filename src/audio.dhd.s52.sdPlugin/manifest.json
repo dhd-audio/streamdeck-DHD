@@ -25,7 +25,7 @@
   "Actions": [
     {
       "Icon": "actions/btnonoff/assets/action-icon",
-      "Name": "DHD Control API",
+      "Name": "Generic On/Off",
       "Controllers": ["Keypad"],
       "DisableAutomaticStates": true,
       "States": [
