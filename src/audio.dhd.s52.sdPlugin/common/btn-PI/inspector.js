@@ -40,15 +40,17 @@ $PI.onConnected((jsn) => {
   $PI.getGlobalSettings();
 });
 
+let debounceTimer;
 document.querySelector("#path").addEventListener("keyup", (event) => {
+  clearTimeout(debounceTimer);
+
   const { value } = event.target;
   console.log("Selected path:", value);
 
-  const payload = {
-    path: value,
-  };
-
-  $PI.setSettings(payload);
+  debounceTimer = setTimeout(
+    () => $PI.setSettings({ path: value }),
+    2000
+  );
 });
 
 $PI.onDidReceiveGlobalSettings((jsn) => {
