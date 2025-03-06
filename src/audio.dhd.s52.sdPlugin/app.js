@@ -8,6 +8,9 @@
  * TODO: add support for `audio/pots/${potId}/value` path
  */
 
+let ipAddress;
+let token;
+
 /**
  * bootstrap the DHD plugin
  */
@@ -18,7 +21,11 @@ $SD.on("connected", (jsn) => {
     console.group("onDidReceiveGlobalSettings");
     console.log(jsn);
 
-    const { ipAddress, token } = jsn.payload.settings;
+    const { settings } = jsn.payload;
+
+    ipAddress = settings.ipAddress;
+    token = settings.token;
+
     connectDevice(ipAddress, token);
 
     console.groupEnd();
@@ -124,7 +131,7 @@ const mkActionInstance = (jsn) => {
     /**
      * Fires when the action appears on the canvas
      *
-     * Register the instance
+     * Bootstrap and register the instance
      */
     onWillAppear() {
       actionInstanceRegistry.set(contextKey, this);
@@ -135,7 +142,7 @@ const mkActionInstance = (jsn) => {
     /**
      * Fires when the action disappears on the canvas
      *
-     * Unregister the instance
+     * Teardown and unregister the instance
      */
     onWillDisappear() {
       actionInstanceRegistry.delete(contextKey);
@@ -147,6 +154,11 @@ const mkActionInstance = (jsn) => {
     onDidReceiveSettings(jsn) {
       if (!jsn.payload.settings.path) {
         console.error("No path set in settings");
+        return;
+      }
+
+      // don't subscribe to empty path (everything
+      if (jsn.payload.settings.path === "") {
         return;
       }
 
@@ -453,6 +465,16 @@ function subscribe(method, path, context) {
 let ws;
 
 /**
+ * @type {number | undefined}
+ */
+let heartbeatInterval;
+/**
+ * @type {number | undefined}
+ */
+let reconnectTimeout;
+
+
+/**
  * @returns {boolean}
  */
 const isWebsocketOpen = () => {
@@ -481,15 +503,16 @@ const sendMessage = (payload) => {
  * Create the websocket connection to the DHD Device and subscribe to messages.
  * When messages are received, they are parsed and sent to the action
  * that are registered in `actionRegistry`.
- *
- * @param {string} ipAddress
- * @param {string} token
  */
-function connectDevice(ipAddress, token) {
+function connectDevice() {
   console.log("Connecting to DHD Device");
 
+  // when user change ip in settings and tries to reconnect, 
+  // any existing connection needs to be closed before
+  ws?.close();
+  clearTimeout(reconnectTimeout);
+
   ws = new WebSocket(`ws://${ipAddress}/api/ws`);
-  let heartbeatInterval;
 
   ws.onopen = () => {
     console.log("WebSocket connection opened");
@@ -552,14 +575,11 @@ function connectDevice(ipAddress, token) {
     console.error("WebSocket error:", error);
   };
 
-  ws.onclose = () => {
-    console.warn("WebSocket connection closed");
+  ws.onclose = (e) => {
+    console.warn("WebSocket connection closed. Status: ", e.code);
 
-    // Clear the heartbeat interval
     clearInterval(heartbeatInterval);
-
-    // Attempt to reconnect after some time
-    setTimeout(connectDevice(ipAddress), 2500);
+    reconnectTimeout = setTimeout(connectDevice, 2500);
   };
 }
 
