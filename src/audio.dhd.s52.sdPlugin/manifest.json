@@ -3,7 +3,7 @@
   "Author": "DHD audio GmbH",
   "CodePath": "app.html",
   "Description": "Control your DHD console with this Stream Deck plugin.",
-  "Name": "DHD Stream Deck",
+  "Name": "DHD Control",
   "Icon": "assets/plugin-icon",
   "URL": "https://github.com/DHD-audio/streamdeck-DHD",
   "Version": "1.0.3",
